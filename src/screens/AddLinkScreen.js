@@ -7,15 +7,39 @@ import { Button } from "../components/Button";
 import { Typography } from "../components/Typography";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Spacer } from "../components/Spacer";
+import { useSetRecoilState } from "recoil";
+import { atomLinkList } from "../states/atomLinkList";
 
 export const AddLinkScreen = () => {
     const navigation = useNavigation();
+    const updateList = useSetRecoilState(atomLinkList);
     const safeAreaInset = useSafeAreaInsets();
     const [url, setUrl] = useState('');
 
     const onPressClose = useCallback(() => {
         navigation.goBack();
     }, []);
+
+    const onPressSave = useCallback(() => {
+        if (!url)
+            return;
+
+        updateList((prevState) => {
+            const list = [{
+                title:'',
+                image:'',
+                link:url,
+                createdAt:new Date().toISOString()
+            }]
+
+            return {
+                list: list.concat(prevState.list)
+            }
+        })
+
+        setUrl('');
+
+    }, [url]);
 
     return (
         <View style={{ flex:1 }}>
@@ -35,7 +59,7 @@ export const AddLinkScreen = () => {
                 />
             </View>
 
-            <Button>
+            <Button onPress={onPressSave}>
                 <View style={{backgroundColor: url ? 'black' : 'gray'}}>
                     <View style={{ height:52, alignItems:'center', justifyContent:'center' }}>
                         <Typography color='white' fontSize={18}>저장</Typography>
