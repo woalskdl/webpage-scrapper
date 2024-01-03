@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { View, useWindowDimensions } from "react-native";
+import { ActivityIndicator, View, useWindowDimensions } from "react-native";
 import { Header } from "../components/header/Header";
 import { useNavigation } from "@react-navigation/native";
 import { SingleLineInput } from "../components/SingleLineInput";
@@ -12,6 +12,7 @@ import { atomLinkList } from "../states/atomLinkList";
 import { getOpenGraphData } from "../utils/OpenGraphTagUtils";
 import { RemoteImage } from '../components/RemoteImage';
 import { getClipboardString } from "../utils/ClipboardUtils";
+import { Icon } from '../components/Icons';
 
 export const AddLinkScreen = () => {
     const navigation = useNavigation();
@@ -19,6 +20,7 @@ export const AddLinkScreen = () => {
     const safeAreaInset = useSafeAreaInsets();
     const [metaData, setMetaData] = useState(null);
     const [url, setUrl] = useState('');
+    const [loading, setLoading] = useState(false);
     const {width} = useWindowDimensions();
 
     const onPressClose = useCallback(() => {
@@ -47,9 +49,11 @@ export const AddLinkScreen = () => {
     }, [url]);
 
     const onSubmitEditing = useCallback(async () => {
+        setLoading(true);
         const result = await getOpenGraphData(url);
 
         setMetaData(result);
+        setLoading(false);
     }, [url])
 
     // https://www.google.com
@@ -84,14 +88,37 @@ export const AddLinkScreen = () => {
                 <Header.Icon iconName='close' onPress={onPressClose}/>
             </Header>
 
-            <View style={{ flex:1, alignItems:'center', justifyContent:'flex-start', paddingTop:32, paddingHorizontal:24 }}>
-                <SingleLineInput
-                    value={url}
-                    onChangeText={setUrl}
-                    placeholder='https://example.com'
-                    onSubmitEditing={onSubmitEditing}
-                />
-                {metaData != null && (
+            <View style={{ flex:1, justifyContent:'flex-start', paddingTop:32, paddingHorizontal:24 }}>
+                <View>
+                    <SingleLineInput
+                        value={url}
+                        onChangeText={setUrl}
+                        placeholder='https://example.com'
+                        onSubmitEditing={onSubmitEditing}
+                    />
+                    <View style={{ position:'absolute', top:0, bottom:0, right:0, borderWidth:1, alignItems:'center', justifyContent:'center' }}>
+                        <Button onPress={() => {
+                            setUrl('');
+                            setMetaData(null);
+                        }}>
+                            <Icon name={'close'} color='black' size={20}/>
+                        </Button>
+                    </View>
+                </View>
+                {loading ?  (
+                    <>
+                        <Spacer space={20}/>
+                        <View style={{ borderWidth:1, borderRadius:4, borderColor:'gray' }}>
+                            <Spacer space={(width - 48) * 0.5} />
+                            <Spacer space={50} />
+
+                            <View style={{ position:'absolute', left:0, right:0, top:0, bottom:0, alignItems:'center', justifyContent:'center' }}>
+                                <ActivityIndicator/>
+                            </View>
+                        </View>
+                    </>
+                )
+                : metaData != null && (
                     <>
                         <Spacer space={20}/>
 
