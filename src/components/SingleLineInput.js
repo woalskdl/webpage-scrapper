@@ -25,6 +25,7 @@ export const SingleLineInput = (props) => {
                 onBlur={() => {
                     setFocused(false);
                 }}
+                onSubmitEditing={props.onSubmitEditing}
             />
         </View>
     )

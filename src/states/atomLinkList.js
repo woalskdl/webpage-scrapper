@@ -9,8 +9,6 @@ const asyncStorageEffect = key => async ({setSelf, onSet}) => {
     }
 
     onSet((newValue, _, isReset) => {
-        console.log('onSet', newValue);
-
         isReset 
         ? removeItem(key) 
         : setItem(key, JSON.stringify(newValue))

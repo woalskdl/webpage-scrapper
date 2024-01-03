@@ -10,7 +10,6 @@ export const RecoilCustomPersist = (props) => {
 
     const loadData = useCallback(async()=>{
         const data = await getItem('MAIN/LINK_LIST');
-        console.log(data);
 
         if(data !== null){
             setList(JSON.parse(data));
